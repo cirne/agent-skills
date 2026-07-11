@@ -56,7 +56,7 @@ This README is the **canonical ops doc** for personal shared skills. Product rep
 
 **Overlay pattern (product repos):** shared `/skill` owns process; `<repo>/.cursor/skills/<skill>.local/` is a **thin** project overlay (commands, paths, defaults). Agents should **follow shared first, then apply the overlay**. Overlays should stay roughly one screen — if they grow into a second full playbook, push general prose back into this repo.
 
-**Brain-app:** overlays live under `brain-app/.cursor/skills/*.local/` (commit, tests, fix, pr, …).
+**Brain-app overlays** (thin; under `brain-app/.cursor/skills/*.local/`): `commit` · `tests` · `pr` · `backlog` · `worktree` · `fix` · `implement` · `interview` · `coverage`. Shared-only there: `deslop` · `verify-this` · `copy` · `global-code-review`.
 
 Cursor does **not** cloud-sync `~/.agents` or `~/.cursor/skills` — git is the sync mechanism.
 
