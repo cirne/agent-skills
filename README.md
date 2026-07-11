@@ -11,13 +11,41 @@ Canonical home for **personal / cross-tool** Agent Skills, following the [Agent 
 ├── hooks/post-merge       ← runs setup.sh after `git pull`
 ├── .gitignore
 └── skills/                ← SOURCE OF TRUTH (real directories only)
-    └── interview/
-        └── SKILL.md
+    ├── interview/
+    ├── pr/
+    ├── commit/
+    ├── deslop/
+    ├── verify-this/
+    ├── fix/
+    ├── implement/
+    ├── tests/
+    ├── worktree/
+    ├── backlog/
+    ├── coverage/
+    ├── global-code-review/
+    └── copy/
 ```
 
 Each skill is a folder named like its frontmatter `name`, containing at least `SKILL.md`.
 
 **Do not** store real skill copies under `~/.cursor/skills/`, `~/.claude/skills/`, or `~/.codex/skills/`. Those directories should hold **per-skill symlinks** into `~/.agents/skills/<name>`.
+
+## Keeping skills up to date (agents: read this)
+
+This README is the **canonical ops doc** for personal shared skills. Product repos may link here from `AGENTS.md`; do **not** invent a project-local skill just to document this home.
+
+| Task | Do |
+|------|-----|
+| **Edit a skill** | Change files only under `~/.agents/skills/<name>/` |
+| **Propagate to Cursor/Claude/Codex** | `~/.agents/setup.sh` (idempotent; creates/repairs per-skill symlinks) |
+| **Save history** | `cd ~/.agents && git add -A && git commit` |
+| **Multi-machine** | `git push` / on other machine `git pull` (post-merge hook runs `setup.sh`) |
+| **New machine** | `git clone <remote> ~/.agents && ~/.agents/setup.sh` |
+| **Project-specific overlay** | Keep as `<repo>/.cursor/skills/<name>.local/` until the shared skill is confirmed; then delete `.local` |
+
+**During migration:** Prefer shared `/skill` for generalized workflows. Use `/skill.local` only when you need brain-app-specific gates (BUG/OPP archive paths, pnpm scripts, focus.md, etc.).
+
+Cursor does **not** cloud-sync `~/.agents` or `~/.cursor/skills` — git is the sync mechanism.
 
 ## Why this pattern
 
