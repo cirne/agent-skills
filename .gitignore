@@ -1,0 +1,5 @@
+# Codex may create this under a mistaken path; never track tool-owned dirs here
+skills/.system/
+
+.DS_Store
+Thumbs.db
