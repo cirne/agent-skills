@@ -18,6 +18,7 @@ Before running gates, learn this repo’s rules (do not invent):
 3. Lint / typecheck / test scripts (`package.json`, Makefile, etc.)
 4. Whether the workflow is **solo land-on-main** vs **PR-required**
 5. Optional focus/WIP file (e.g. `focus.md`) — only touch if the project uses it
+6. Project overlay **`/commit.local`** (or `.cursor/skills/commit.local/`) — when present, **its gate matrix and defaults replace discovery** for this repo
 
 ## 1. Self-review
 

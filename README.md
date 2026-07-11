@@ -54,7 +54,9 @@ This README is the **canonical ops doc** for personal shared skills. Product rep
 | **New machine** | `git clone <remote> ~/.agents && ~/.agents/setup.sh` |
 | **Project-specific overlay** | Keep as `<repo>/.cursor/skills/<name>.local/` until the shared skill is confirmed; then delete `.local` |
 
-**During migration:** Prefer shared `/skill` for generalized workflows. Use `/skill.local` only when you need brain-app-specific gates (BUG/OPP archive paths, pnpm scripts, focus.md, etc.).
+**Overlay pattern (product repos):** shared `/skill` owns process; `<repo>/.cursor/skills/<skill>.local/` is a **thin** project overlay (commands, paths, defaults). Agents should **follow shared first, then apply the overlay**. Overlays should stay roughly one screen — if they grow into a second full playbook, push general prose back into this repo.
+
+**Brain-app:** overlays live under `brain-app/.cursor/skills/*.local/` (commit, tests, fix, pr, …).
 
 Cursor does **not** cloud-sync `~/.agents` or `~/.cursor/skills` — git is the sync mechanism.
 
