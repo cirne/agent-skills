@@ -2,6 +2,17 @@
 
 Canonical home for **personal / cross-tool** Agent Skills, following the [Agent Skills](https://agentskills.io/) open standard and the cross-client discovery path documented in the [client implementation guide](https://agentskills.io/client-implementation/adding-skills-support).
 
+**Public repo:** [github.com/cirne/agent-skills](https://github.com/cirne/agent-skills) · MIT licensed.
+
+## Quick start (new machine)
+
+```bash
+git clone https://github.com/cirne/agent-skills.git ~/.agents
+~/.agents/setup.sh
+```
+
+If `~/.agents` already exists with skills, either move it aside or add this remote and pull.
+
 ## Layout
 
 ```text
@@ -159,21 +170,24 @@ git clone <remote-url> ~/.agents
 
 ## Git workflow
 
-`~/.agents` is its own git repository (separate from any product repo).
+`~/.agents` is its own git repository (separate from any product repo). **Remote:** `https://github.com/cirne/agent-skills.git` (public).
 
 ```bash
 cd ~/.agents
 git status
 git add -A
-git commit -m "Add interview skill"
-# once a remote exists:
-git remote add origin git@github.com:<you>/<agents-skills>.git   # first time only
-git push -u origin main
+git commit -m "Add my-skill"
+git push origin main
 ```
 
 On another machine: clone → `setup.sh` → pull later (hook re-links).
 
-If there is no remote yet, local commits still work; add `origin` when the user wants multi-machine sync.
+```bash
+git clone https://github.com/cirne/agent-skills.git ~/.agents
+~/.agents/setup.sh
+# later:
+cd ~/.agents && git pull
+```
 
 ## Project vs personal skills
 
