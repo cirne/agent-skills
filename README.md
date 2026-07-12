@@ -54,9 +54,9 @@ This README is the **canonical ops doc** for personal shared skills. Product rep
 | **New machine** | `git clone <remote> ~/.agents && ~/.agents/setup.sh` |
 | **Project-specific overlay** | Keep as `<repo>/.cursor/skills/<name>.local/` until the shared skill is confirmed; then delete `.local` |
 
-**Overlay pattern (product repos):** shared `/skill` owns process; `<repo>/.cursor/skills/<skill>.local/` is a **thin** project overlay (commands, paths, defaults). Agents should **follow shared first, then apply the overlay**. Overlays should stay roughly one screen — if they grow into a second full playbook, push general prose back into this repo.
+**Overlay pattern (product repos):** shared `/skill` owns process; `<repo>/.cursor/skills/<skill>.local/SKILL.md` is a **thin** project overlay (commands, paths, defaults, judgment gates). Agents should **follow shared first, then apply the overlay**. Overlay wins on gate/default conflicts only. Overlays should stay roughly one screen — if they grow into a second full playbook, push general prose back into this repo.
 
-**Brain-app overlays** (thin; under `brain-app/.cursor/skills/*.local/`): `commit` · `tests` · `pr` · `backlog` · `worktree` · `fix` · `implement` · `interview` · `coverage`. Shared-only there: `deslop` · `verify-this` · `copy` · `global-code-review`.
+**Examples:** `brain-app/.cursor/skills/*.local/` (`commit`, `tests`, `pr`, `backlog`, `worktree`, `fix`, `implement`, `interview`, `coverage`; shared-only there: `deslop`, `verify-this`, `copy`, `global-code-review`). `marshall/.cursor/skills/commit.local/` — `/llms.txt` freshness + Marshall gates.
 
 Cursor does **not** cloud-sync `~/.agents` or `~/.cursor/skills` — git is the sync mechanism.
 

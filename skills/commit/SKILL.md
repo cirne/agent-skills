@@ -18,7 +18,10 @@ Before running gates, learn this repo’s rules (do not invent):
 3. Lint / typecheck / test scripts (`package.json`, Makefile, etc.)
 4. Whether the workflow is **solo land-on-main** vs **PR-required**
 5. Optional focus/WIP file (e.g. `focus.md`) — only touch if the project uses it (`docs/README.md` / `AGENTS.md`)
-6. Project overlay **`/commit.local`** (or `.cursor/skills/commit.local/`) — when present, **its gate matrix and defaults replace discovery** for this repo
+6. **Project overlay** — if either path exists, **read it and apply after this skill** (do not invent repo gates):
+   - `.cursor/skills/commit.local/SKILL.md` (preferred)
+   - `.agents/skills/commit.local/SKILL.md`
+   Overlay owns repo-specific gate matrix, paths, and defaults. Shared `/commit` still owns the overall process (review → gates → commit → land → push). Overlay wins on conflicts for gates/defaults only. Keep overlays thin (~one screen); push general prose back into this skill.
 
 ## 1. Self-review
 
@@ -52,7 +55,9 @@ Use the **smallest** commands that cover the diff (project scripts). Typical ord
 2. Typecheck appropriate to touched packages
 3. Scoped tests via `/tests` (log full output; never pipe)
 
-All must exit **0** before commit. Full suite is post-commit / land / push — not every iteration.
+If a `commit.local` overlay defines extra judgment gates (docs freshness, i18n, etc.), run those here too.
+
+All must exit **0** (or explicit accept for judgment warnings) before commit. Full suite is post-commit / land / push — not every iteration.
 
 ## 4. Commit (local only)
 
