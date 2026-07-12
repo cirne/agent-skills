@@ -5,13 +5,13 @@ description: End-to-end opportunity/feature implementation—read the tracked sp
 
 # Implement (opportunity workflow)
 
-Mirror of `/fix` for **new improvements and features** tracked in the project backlog (often `OPP-NNN` or equivalent).
+Mirror of `/fix` for **new improvements and features** tracked in the project backlog (ids/paths per `docs/README.md` — discover via `/backlog`).
 
 ## Which path?
 
 | User input | Backlog | After ship |
 |------------|---------|------------|
-| Tracked opportunity id / path / matching active row | Read that spec; cite the id | Archive per `/backlog` |
+| Tracked backlog id / path / matching active row | Read that spec; cite the id | Archive per `/backlog` |
 | Ad-hoc feature only | **Stop** — ask whether to file a backlog item or do a small in-place change | Archive only if promoted first |
 
 ## Workflow

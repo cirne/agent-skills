@@ -21,11 +21,11 @@ The interview exists so **another agent can implement and validate the work with
 Before the first question, locate how this repo tracks work (do not invent a layout):
 
 1. Spec file or ticket the user named (path, id, or title).
-2. Index / backlog files if present (e.g. `docs/OPPORTUNITIES.md`, `docs/BUGS.md`, `TODO.md`, Linear/GitHub issue).
-3. Agent conventions (`AGENTS.md`, `CLAUDE.md`, `.cursor/rules`, ADRs / architecture docs).
-4. Sibling skills for post-handoff work (`fix`, `implement`, `backlog`) if they exist in the project.
+2. **`docs/README.md`** (org SoT for backlog/docs) and any paths it names; then `AGENTS.md` / `CLAUDE.md` if needed. Same discovery order as `/backlog`.
+3. Index / spec files only as that README (or existing tracker) defines — not Brain defaults unless this repo uses them.
+4. Sibling skills for post-handoff work (`fix`, `implement`, `backlog`) if they exist.
 
-Prefer the repo’s existing id scheme and doc paths. If none exist, keep decisions in the single spec file the user pointed at.
+Prefer the repo’s existing id scheme and doc paths. If none exist, keep decisions in the single spec file the user pointed at (or ask `/backlog` to bootstrap docs README guidance).
 
 ## When to run
 

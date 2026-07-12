@@ -5,13 +5,13 @@ description: End-to-end bug fix workflow—reproduce via regression tests (TDD) 
 
 # Fix (bug workflow)
 
-Prefer **TDD**: failing automated check first when practical. Discover project conventions from AGENTS.md / contributing docs.
+Prefer **TDD**: failing automated check first when practical. Discover backlog paths via `/backlog` (reads `docs/README.md` first) and project `AGENTS.md` / contributing docs.
 
 ## Which path?
 
 | User input | Backlog | After fix |
 |------------|---------|-----------|
-| Tracked bug id / path / matching active backlog row | Read that spec; cite the id in commits | Archive per `/backlog` |
+| Tracked bug / backlog id / path / matching active row | Read that spec; cite the id in commits | Archive per `/backlog` |
 | Ad-hoc description only | Do **not** file a new backlog entry unless asked | Skip archive; commit only |
 
 When unsure, search the backlog before choosing.
