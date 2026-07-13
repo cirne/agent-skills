@@ -53,6 +53,17 @@ Large diffs (**>15 files** or **>500 lines**): slice review by directory or para
 
 Optional: `/deslop` on agent-heavy branches before gates.
 
+## 2b. Docs hygiene (before commit)
+
+When the change affects behavior, APIs, ops, skills, or tracked process — or when the diff itself is docs — bring related docs along. Do **not** leave the tree with stale or forked guidance.
+
+1. **Up to date** — Update the docs that describe what you changed (README, architecture, runbooks, skill text, focus/WIP if the project uses it). If behavior moved, the prose moves in the same commit (or an immediate follow-up in the same `/commit` before sync).
+2. **Single source of truth** — Prefer one canonical doc (or skill) and **link** elsewhere. Do not copy procedure into a second file “for convenience.” If two places already disagree, fix the canonical and delete or shrink the duplicate to a pointer.
+3. **Internally consistent** — Touched docs must not contradict each other or the code (commands, paths, defaults, “required vs optional” steps). After edits, skim cross-links you changed for drift.
+4. **Repo map** — If `docs/README.md` (or equivalent) defines where docs live, follow it; overlays may name extra required files (e.g. `focus.md`).
+
+Docs-only commits still go through this check — freshness and consistency matter even when CI is skipped.
+
 ## 3. Pre-commit gate
 
 Use the **smallest** commands that cover the diff (project scripts). Typical order:
@@ -105,6 +116,7 @@ If push is blocked (permissions, hooks, network), report the blocker and leave s
 
 ```text
 Findings: <critical/warning/note counts, or "none">
+Docs: <updated / N/A / fixed SSOT drift>
 Pre-commit: <commands + exit codes + log paths>
 Commit: <hash + message>
 Land: <done / skipped / blocked>
