@@ -92,7 +92,7 @@ git status -sb           # no ahead/behind vs upstream
 
 Typical sequence:
 
-1. Run full CI / full suite if the project overlay expects it before push
+1. Run full CI / full suite **only if the project overlay expects it before push** — **skip** for docs-only / comment-only / skill-markdown changes (and whenever the overlay says skip)
 2. `git fetch` + `git pull --ff-only` (or rebase if that is the repo norm) if remote moved
 3. `git push -u` as needed so local and upstream match
 4. Re-check status: clean and not ahead/behind
