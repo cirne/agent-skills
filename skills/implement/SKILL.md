@@ -46,4 +46,6 @@ Red → green → refactor within scope. Scoped type/lint before re-tests (`/tes
 
 ## Related
 
-- `/interview` · `/fix` · `/copy` · `/tests` · `/coverage` · `/verify-this` · `/deslop` · `/backlog` · `/commit`
+- `/interview` · `/fix` · `/raptor` · `/copy` · `/tests` · `/coverage` · `/verify-this` · `/deslop` · `/backlog` · `/commit`
+
+Optional: `/implement … with /raptor` for a deletion bias—follow `/raptor` ask/proceed and app-LOC validation.

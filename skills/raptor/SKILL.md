@@ -147,7 +147,7 @@ automate a workaround that should vanish.
 - [ ] 3. Mark candidates to delete (parts, layers, flags, compat shims, processes)
 - [ ] 4. For each delete: lesson kept, rollback, validate-by; tag proceed vs ask
 - [ ] 5. Proposal mode → report and stop; Implement mode → ask on tagged deep cuts
-- [ ] 6. Only then: cut in small reversible steps; validate; add back ~10% if needed
+- [ ] 6. Cut in small reversible steps; validate (incl. app LOC ↓); add back ~10% if needed
 ```
 
 ### Questions to force deletion
@@ -176,25 +176,28 @@ one clear data path. Accept putting ~10% back after a delete overshoots.
 A Raptor pass **succeeded** only if capability held (or improved) while
 complexity fell—and the cut was *reversible until proven*.
 
-**Succeeded when all of these are true:**
+**Succeeded when all of these are true** (after implement; proposal mode only
+forecasts them):
 
 1. **Goal intact** — the one-sentence outcome still works (demo, eval, or user path).
 2. **Complexity actually down** — fewer modules/paths/flags/steps; not a rewrite that
    relocated the same Christmas tree.
 3. **Application LOC down** — net lines of **application** code fell while addressing
-   the issue (`git diff --stat` / line counts on product paths). **Do not** count
-   test or eval code (those may grow to lock the simpler behavior). Docs/skills
-   similarly excluded unless they *are* the product under change.
+   the issue. Measure with `git diff --stat` (or equivalent) on **product paths only**.
+   **Exclude** test and eval code entirely—those may grow to lock simpler behavior.
+   Exclude docs/skills unless they *are* the product under change. Move/rename
+   theater that holds LOC flat does not count as a win.
 4. **Lessons preserved** — every deleted artifact has an explicit “why it existed”
    note; hard-won constraints remain as simpler enforcement (test, type, invariant).
 5. **Add-back budget used honestly** — something came back, or a written reason why
-   zero add-backs is still aggressive enough *and* validated.
+   zero add-backs is still aggressive enough *and* validated. Net app LOC should
+   still be down after add-backs.
 6. **Blast radius bounded** — scoped diff; rollback known (revert commit, flag, restore).
 
 **Failed (stop / restore) when any of these appear:**
 
 - Goal regressions (“simpler” but the job no longer works)
-- Application LOC rose (or held flat via move/rename theater) while claiming a Raptor win
+- Application LOC rose (or flat via move/rename theater) while claiming a Raptor win
 - Deleted safety, auth, or integrity with no replacement constraint
 - New abstraction layer claimed as simplification
 - No way to tell if the delete was wrong (no test, no metric, no owner watching)
@@ -203,7 +206,8 @@ complexity fell—and the cut was *reversible until proven*.
 **Minimum evidence before calling it done:**
 
 - Named success checks run green (project tests, eval, or manual script of the goal)
-- Application LOC delta (exclude `*.test.*`, eval harness/tasks, fixtures-as-tests)
+- Application LOC delta on product paths only (exclude `*.test.*`, `*.spec.*`,
+  eval harness/tasks, test fixtures)
 - Short “what died / what we learned / what we added back” summary
 - Explicit residual risks (what we might still need to restore)
 
@@ -224,7 +228,7 @@ Deletes (parts/processes/paths): …
     gate: proceed | ask (why)
 What we learn from the old design (keep the lesson, not the artifact): …
 What remains (minimal): …
-Application LOC delta (exclude tests/evals): … → … (net …)
+Application LOC delta (exclude tests/evals; after implement): … → … (net …)
 Risks / what we might add back (~10%): …
 Success criteria (falsifiable): …
 Not doing yet (optimize / speed / automate): …
@@ -238,20 +242,12 @@ implement). Surface any `gate: ask` items before cutting them.
 ## Guardrails
 
 - Be thoughtful about **when to ask “are you sure?”**—not never, not always.
-- Proposal mode: no tree rewrites without explicit implement approval.
-- Implement mode: proceed on clear covered deletes; ask on deep cuts; never skip
-  hard stops or validation.
-- Deletion must preserve the real goal—not delete the product.
-- Prefer surgical removal over a glamorous rewrite unless the rewrite *is* the deletion.
-- Do not bypass safety, auth, or tests to “simplify”; delete *needless* ceremony,
-  not load-bearing checks.
-- When past decisions encoded hard-won constraints, keep the constraint—delete
-  the scaffolding around it.
-- One delete cluster per pass when implementing; validate before the next cluster.
-- Never mix “Raptor simplification” with unrelated refactors in the same change.
-- If validation fails, **add back or revert**—do not layer fixes on a bad delete.
-- Use `/interview` only when a pause opens real product-scope forks—not for every
-  safe delete.
+- Proposal → report; Implement → cut only what’s in scope (ask on deep cuts).
+- Preserve the real goal; keep hard-won constraints, delete scaffolding.
+- Surgical removal over rewrite theater; no unrelated refactors in the same change.
+- Never skip hard stops (auth/integrity/trust) or validation (incl. app LOC ↓).
+- One delete cluster per pass; if validation fails, **add back or revert**.
+- `/interview` only when a pause opens real product-scope forks.
 
 ## Provenance (short)
 

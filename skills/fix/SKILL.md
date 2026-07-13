@@ -51,7 +51,7 @@ Follow `/fix` (TDD → fix → verify → commit). Thread `/raptor` into underst
 1. **Understand** — Bug goal in one sentence. Prefer a delete that removes the failure mode over a shim.
 2. **Reproduce** — Unchanged (failing test/eval first).
 3. **Fix** — Simplest design that goes green. Apply `/raptor` **When to ask “are you sure?”**: proceed on clear covered deletes; pause on deep cuts.
-4. **Verify** — Repro green **and** Raptor success checks. Prefer `/verify-this`.
+4. **Verify** — Repro green **and** Raptor checks (goal intact, app LOC ↓ excluding tests/evals). Prefer `/verify-this`.
 5–6. Commit / archive as usual.
 
 Do not write a full Raptor proposal essay unless the user asked for analysis-only
