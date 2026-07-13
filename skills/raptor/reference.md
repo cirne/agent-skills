@@ -28,7 +28,9 @@ Stated on the 2021 Everyday Astronaut Starbase walk; compressed as a mantra in
 Lex Fridman #438 (2024). Order is the point.
 
 1. **Make the requirements less dumb** — everyone’s wrong some of the time;
-   requirements need a named person, not a department.
+   requirements need a named person, not a department. In software: dig
+   backlog/git/evals for *why* a path landed, then judge against the product
+   **as it is now** — past ambition is not physics.
 2. **Delete the part or process** — if you aren’t adding ~10% back, you didn’t
    delete enough.
 3. **Simplify / optimize** — only after 1–2; don’t optimize what shouldn’t exist.
