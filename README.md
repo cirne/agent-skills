@@ -34,7 +34,8 @@ If `~/.agents` already exists with skills, either move it aside or add this remo
     ├── backlog/
     ├── coverage/
     ├── global-code-review/
-    └── copy/
+    ├── copy/
+    └── raptor/
 ```
 
 Each skill is a folder named like its frontmatter `name`, containing at least `SKILL.md`.
@@ -56,7 +57,7 @@ This README is the **canonical ops doc** for personal shared skills. Product rep
 
 **Overlay pattern (product repos):** shared `/skill` owns process; `<repo>/.cursor/skills/<skill>.local/SKILL.md` is a **thin** project overlay (commands, paths, defaults, judgment gates). Agents should **follow shared first, then apply the overlay**. Overlay wins on gate/default conflicts only. Overlays should stay roughly one screen — if they grow into a second full playbook, push general prose back into this repo.
 
-**Examples:** `brain-app/.cursor/skills/*.local/` (`commit`, `tests`, `pr`, `backlog`, `worktree`, `fix`, `implement`, `interview`, `coverage`; shared-only there: `deslop`, `verify-this`, `copy`, `global-code-review`). `marshall/.cursor/skills/commit.local/` — `/llms.txt` freshness + Marshall gates.
+**Examples:** `brain-app/.cursor/skills/*.local/` (`commit`, `tests`, `pr`, `backlog`, `worktree`, `fix`, `implement`, `interview`, `coverage`; shared-only there: `deslop`, `verify-this`, `copy`, `global-code-review`, `raptor`). `marshall/.cursor/skills/commit.local/` — `/llms.txt` freshness + Marshall gates.
 
 Cursor does **not** cloud-sync `~/.agents` or `~/.cursor/skills` — git is the sync mechanism.
 
