@@ -181,15 +181,20 @@ complexity fell—and the cut was *reversible until proven*.
 1. **Goal intact** — the one-sentence outcome still works (demo, eval, or user path).
 2. **Complexity actually down** — fewer modules/paths/flags/steps; not a rewrite that
    relocated the same Christmas tree.
-3. **Lessons preserved** — every deleted artifact has an explicit “why it existed”
+3. **Application LOC down** — net lines of **application** code fell while addressing
+   the issue (`git diff --stat` / line counts on product paths). **Do not** count
+   test or eval code (those may grow to lock the simpler behavior). Docs/skills
+   similarly excluded unless they *are* the product under change.
+4. **Lessons preserved** — every deleted artifact has an explicit “why it existed”
    note; hard-won constraints remain as simpler enforcement (test, type, invariant).
-4. **Add-back budget used honestly** — something came back, or a written reason why
+5. **Add-back budget used honestly** — something came back, or a written reason why
    zero add-backs is still aggressive enough *and* validated.
-5. **Blast radius bounded** — scoped diff; rollback known (revert commit, flag, restore).
+6. **Blast radius bounded** — scoped diff; rollback known (revert commit, flag, restore).
 
 **Failed (stop / restore) when any of these appear:**
 
 - Goal regressions (“simpler” but the job no longer works)
+- Application LOC rose (or held flat via move/rename theater) while claiming a Raptor win
 - Deleted safety, auth, or integrity with no replacement constraint
 - New abstraction layer claimed as simplification
 - No way to tell if the delete was wrong (no test, no metric, no owner watching)
@@ -198,6 +203,7 @@ complexity fell—and the cut was *reversible until proven*.
 **Minimum evidence before calling it done:**
 
 - Named success checks run green (project tests, eval, or manual script of the goal)
+- Application LOC delta (exclude `*.test.*`, eval harness/tasks, fixtures-as-tests)
 - Short “what died / what we learned / what we added back” summary
 - Explicit residual risks (what we might still need to restore)
 
@@ -218,6 +224,7 @@ Deletes (parts/processes/paths): …
     gate: proceed | ask (why)
 What we learn from the old design (keep the lesson, not the artifact): …
 What remains (minimal): …
+Application LOC delta (exclude tests/evals): … → … (net …)
 Risks / what we might add back (~10%): …
 Success criteria (falsifiable): …
 Not doing yet (optimize / speed / automate): …
