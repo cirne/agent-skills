@@ -1,11 +1,17 @@
 ---
 name: commit
-description: Guides pre-commit self-review, optional deslop, scoped lint/typecheck/tests, commit locally, then land on the default branch; push to origin only on explicit request. Use when the user invokes /commit, asks to commit, land on main, push, or finish a change with git.
+description: >-
+  Guides pre-commit self-review, optional deslop, scoped lint/typecheck/tests,
+  commit, land, and sync with origin until the working tree is clean and the
+  branch matches its remote. Use when the user invokes /commit, asks to commit,
+  land on main, push, or finish a change with git.
 ---
 
 # Commit workflow
 
-**Default path:** pre-commit gates → **commit locally** → land on local default branch when using feature worktrees → **push only on explicit request**.
+**Done means:** working tree **clean** and the current branch **in sync with its remote** (not ahead, not behind). Do not stop after a local-only commit while `git status` still shows ahead/behind.
+
+**Default path:** pre-commit gates → **commit** → land on local default branch when using feature worktrees → **push / sync to origin** → verify clean + synced.
 
 Prioritize **correctness, security, and regressions** over style-only nits unless the user asked for polish.
 
@@ -21,7 +27,7 @@ Before running gates, learn this repo’s rules (do not invent):
 6. **Project overlay** — if either path exists, **read it and apply after this skill** (do not invent repo gates):
    - `.cursor/skills/commit.local/SKILL.md` (preferred)
    - `.agents/skills/commit.local/SKILL.md`
-   Overlay owns repo-specific gate matrix, paths, and defaults. Shared `/commit` still owns the overall process (review → gates → commit → land → push). Overlay wins on conflicts for gates/defaults only. Keep overlays thin (~one screen); push general prose back into this skill.
+   Overlay owns repo-specific gate matrix, paths, and defaults. Shared `/commit` still owns the overall process (review → gates → commit → land → **sync**). Overlay wins on conflicts for gates/defaults only. Keep overlays thin (~one screen); push general prose back into this skill.
 
 ## 1. Self-review
 
@@ -59,11 +65,11 @@ If a `commit.local` overlay defines extra judgment gates (docs freshness, i18n, 
 
 All must exit **0** (or explicit accept for judgment warnings) before commit. Full suite is post-commit / land / push — not every iteration.
 
-## 4. Commit (local only)
+## 4. Commit
 
 1. Conventional Commits (`feat:`, `fix:`, …) unless the repo uses another style
 2. No secrets or generated junk
-3. **Do not push** unless the user explicitly asks
+3. After commit, continue to land (if needed) and **§6 Sync** — local-only commit is not finished work
 
 ## 5. Land (solo / worktree workflows)
 
@@ -71,17 +77,29 @@ If the project uses feature worktrees and lands locally (see `/worktree`):
 
 - From the primary clone: merge feature branch into local default branch
 - Remove the worktree with `git worktree remove` (not `rm -rf`)
-- Still **no push** unless asked
+- Then **§6 Sync** the default branch (or the branch the overlay says to publish)
 
-If the project requires PRs, stop after push-ready branch and point the user at `/pr` (or their PR flow).
+If the project requires PRs: push the feature branch (§6), open/update the PR if that is the repo’s handoff, and treat **done** as clean working tree + feature branch synced with its remote (PR merge is separate unless the user asked to merge).
 
-## 6. Push (explicit request only)
+## 6. Sync with remote (required to finish)
 
-When the user says “push” / “sync to origin”:
+`/commit` is **not complete** until:
 
-1. Run full CI / full suite if the project expects it before push
-2. `git pull --ff-only` if needed
-3. `git push` — never force-push the default branch without explicit ask
+```sh
+git status --porcelain   # empty
+git status -sb           # no ahead/behind vs upstream
+```
+
+Typical sequence:
+
+1. Run full CI / full suite if the project overlay expects it before push
+2. `git fetch` + `git pull --ff-only` (or rebase if that is the repo norm) if remote moved
+3. `git push -u` as needed so local and upstream match
+4. Re-check status: clean and not ahead/behind
+
+Never force-push the default branch without an explicit ask. Never force-push shared branches unless the user explicitly requests it.
+
+If push is blocked (permissions, hooks, network), report the blocker and leave status honest — do not claim done.
 
 ## Output
 
@@ -90,5 +108,6 @@ Findings: <critical/warning/note counts, or "none">
 Pre-commit: <commands + exit codes + log paths>
 Commit: <hash + message>
 Land: <done / skipped / blocked>
-Push: <not requested | done | skipped>
+Sync: <pushed / already synced / blocked — reason>
+Status: <clean + in sync with origin/<branch> | not done — …>
 ```
