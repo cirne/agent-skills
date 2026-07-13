@@ -2,11 +2,12 @@
 name: raptor
 description: >-
   Simplify designs the Raptor way—first principles, aggressive deletion, and
-  learning from past decisions instead of protecting them. Default is proposal
-  only; implementing deletes requires explicit approval and falsifiable
-  validation. Use when the user invokes /raptor, asks to simplify architecture
-  or a design like Raptor 3, strip accidental complexity, challenge inherited
-  requirements, or apply SpaceX-style delete-before-optimize thinking.
+  learning from past decisions instead of protecting them. Standalone default is
+  proposal only; `/fix … with /raptor` proceeds on clear test-covered deletes and
+  asks the user on deep cuts. Use when the user invokes /raptor, pairs /fix with
+  /raptor, asks to simplify architecture or a design like Raptor 3, strip
+  accidental complexity, challenge inherited requirements, or apply SpaceX-style
+  delete-before-optimize thinking.
 ---
 
 # Raptor
@@ -21,10 +22,16 @@ bolted on. Apply the same discipline to software, APIs, processes, and product s
 Raptor is a **deletion lens**, not a license to gut the system. Done wrong it
 removes load-bearing constraints, breaks users, and “simplifies” by amnesia.
 
-**Default mode: proposal only.** Produce the report. Do **not** delete code,
-drop tables, remove APIs, or rewrite trees until the user explicitly says to
-implement—and then only the approved deletes.
+**Default mode depends on invocation:**
 
+| Invocation | Default |
+|------------|---------|
+| `/raptor` alone (design review / simplification pass) | **Proposal only** — do not delete until the user approves implement |
+| `/fix … with /raptor` | **Fix with deletion bias** — proceed on clear, test-covered cuts; **stop and ask** on deep cuts (see Composed with /fix) |
+
+Never delete code, drop tables, remove APIs, or rewrite trees in proposal-only
+mode. Under `/fix … with /raptor`, only cut what the bug goal justifies—and
+pause when implications need a human.
 | Misuse | What it looks like | Do instead |
 |--------|--------------------|------------|
 | Delete without a goal | “Remove complexity” with no outcome | One-sentence first-principles goal first |
@@ -82,13 +89,38 @@ automate a workaround that should vanish.
 ## When to run
 
 - User invokes `/raptor` or asks for Raptor-style simplification
+- **`/fix … with /raptor`** (or “fix BUG-N with Raptor”) — deletion lens *inside* the bug fix; see **Composed with /fix** below
 - Design review where complexity is growing faster than capability
 - Before a big rewrite *or* a big feature add (challenge whether either is needed)
 - After shipping v1/v2, when deciding what the next generation should *drop*
 
-**Not a substitute for** `/deslop` (local AI-slop cleanup), `/fix` (bug fix),
+**Not a substitute for** `/deslop` (local AI-slop cleanup), `/fix` alone (bug fix without a deletion thesis),
 or `/global-code-review` (manageability ranking). Raptor is the *deletion /
 first-principles* lens on a concrete design or change set.
+
+## Composed with `/fix` (preferred bug use case)
+
+Ideal prompt: **`/fix BUG-232 with /raptor`**.
+
+Here Raptor is not a separate proposal essay by default. It biases the fix toward
+**delete the accidental complexity that caused the bug**, under `/fix`’s TDD and
+verify loop.
+
+| Situation | Behavior |
+|-----------|----------|
+| Cut is clear, reversible, covered by the failing repro (+ obvious neighbors) | **Proceed** — simplify and fix; prove no regressions; note what died |
+| Deep cut / hard tradeoff / unclear lesson / blast radius beyond the bug | **Stop and ask** — short implications question; wait for the user |
+| Standalone `/raptor` (no `/fix`) | Stay in **proposal only** until explicit implement approval |
+
+**Ask shape (when pausing):** what you’d delete, what still works, what might break,
+what lesson you’d keep, rollback. One question; don’t batch unrelated tradeoffs.
+
+**Proceed shape:** red repro → delete/simplify → green repro → `/verify-this` (and
+Raptor success checks) → commit. If validation fails, add back or revert—don’t
+stack patches on a bad delete.
+
+Full interview is optional: use `/interview` only when the pause reveals open
+product scope, not for every safe delete.
 
 ## Workflow
 
@@ -181,7 +213,9 @@ is failure. If Mode is PROPOSAL ONLY, end after the report.
 
 ## Guardrails
 
-- **Propose first; implement only on explicit approval.**
+- **Standalone `/raptor`:** propose first; implement only on explicit approval.
+- **`/fix … with /raptor`:** proceed on clear covered deletes; ask on deep cuts;
+  never skip hard stops or verification.
 - Deletion must preserve the real goal—not delete the product.
 - Prefer surgical removal over a glamorous rewrite unless the rewrite *is* the deletion.
 - Do not bypass safety, auth, or tests to “simplify”; delete *needless* ceremony,
