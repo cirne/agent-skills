@@ -22,14 +22,23 @@ When unsure, search the backlog before choosing.
 
    For **agent/reasoning** failures: prefer improving tools, prompts, and context over heuristics (project agent-design docs if present).
 
-2. **Reproduce (TDD)** — Smallest automated repro:
-   - Agent-shaped → eval task / harness if the repo has one
-   - Otherwise → failing unit/integration/UI test
+2. **Reproduce (TDD)** — Smallest automated repro that actually fails for the bug class:
+
+   | Bug class | Primary repro | Secondary (optional) |
+   |-----------|---------------|----------------------|
+   | **Agent accuracy** — prompts, tool descriptions/output, tool↔prompt integration, retrieval/routing, “model chose the wrong tool” | **Eval** (live agent + expect on tools/answer) when the project has an eval harness | Unit tests for pure helpers / deterministic tool envelopes only |
+   | Everything else | Failing unit/integration/UI test | — |
+
+   **Agent accuracy — do not treat as sufficient repro/verify:**
+   - Asserting a string/fragment exists in a prompt, skill, or tool `description`
+   - Snapshotting full system prompts without exercising the agent loop
+   Those checks are cheap to pass and do not prove the model uses the right tools or retrieves the right corpus. Prefer an eval that fails when the agent takes the wrong path (e.g. `search_mail` instead of unified `search`).
+
    - If you cannot get a red repro → **stop and ask** for concrete details
 
-3. **Fix** — Minimal change that satisfies the repro. Run scoped type/lint before re-testing (`/tests`). Optional `/deslop` if noisy.
+3. **Fix** — Minimal change that satisfies the repro. For agent accuracy: tools/context/prompts first (project agent-design hierarchy), not keyword heuristics. Run scoped type/lint before re-testing (`/tests`). Optional `/deslop` if noisy.
 
-4. **Verify** — `/verify-this`: falsifiable claim + baseline vs treatment → `VERIFIED` / `NOT VERIFIED` / `INCONCLUSIVE`. Do not land on `NOT VERIFIED`.
+4. **Verify** — `/verify-this`: falsifiable claim + baseline vs treatment → `VERIFIED` / `NOT VERIFIED` / `INCONCLUSIVE`. Do not land on `NOT VERIFIED`. For agent-accuracy bugs, the treatment evidence should include a **passing eval** (or an explicit INCONCLUSIVE if the harness/fixture cannot run), not only green unit tests.
 
 5. **Commit** — `/commit` (include bug id when tracked).
 
