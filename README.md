@@ -13,6 +13,25 @@ git clone https://github.com/cirne/agent-skills.git ~/.agents
 
 If `~/.agents` already exists with skills, either move it aside or add this remote and pull.
 
+`setup.sh` always creates `~/.claude`, `~/.codex`, and `~/.cursor` (then syncs per-skill symlinks into each). Optional agent homes (Gemini, Amp, OpenCode, Goose, Crush) are synced only if they already exist.
+
+### Cursor Cloud Agents
+
+Cloud Agents inject `available_skills` from `~/.claude/skills` (and `<repo>/.claude/skills`) — **not** from `~/.cursor/skills`. Product-repo bootstraps that only `mkdir -p ~/.cursor` before running `setup.sh` used to leave Claude’s home missing, so `/implement`, `/commit`, `/pr`, and friends never appeared.
+
+**Product-repo pattern:** commit project skills under `.claude/skills/` (Cloud + Claude Code discovery), and symlink or mirror into `../.cursor/skills/` for local Cursor Customize / IDE paths when needed.
+
+**Minimal install fragment** (VM / Cloud Agent / fresh machine):
+
+```bash
+if [ -d "${HOME}/.agents/.git" ]; then
+  git -C "${HOME}/.agents" pull --ff-only
+else
+  git clone https://github.com/cirne/agent-skills.git "${HOME}/.agents"
+fi
+"${HOME}/.agents/setup.sh"
+```
+
 ## Layout
 
 ```text

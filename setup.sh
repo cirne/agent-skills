@@ -13,11 +13,18 @@ set -euo pipefail
 AGENTS_DIR="${HOME}/.agents"
 SKILLS_SRC="${AGENTS_DIR}/skills"
 
+# Always mkdir + sync. Cursor Cloud Agents inject available_skills from
+# ~/.claude/skills (and <repo>/.claude/skills), not ~/.cursor/skills — so
+# product-repo bootstraps that only mkdir ~/.cursor still need ~/.claude.
 # path:relative_link_prefix (from <agent>/skills/ to ~/.agents/skills/)
-AGENTS=(
+CORE_AGENTS=(
   "${HOME}/.claude:../../.agents/skills"
   "${HOME}/.codex:../../.agents/skills"
   "${HOME}/.cursor:../../.agents/skills"
+)
+
+# Sync only if the agent home already exists (optional tools).
+OPTIONAL_AGENTS=(
   "${HOME}/.gemini:../../.agents/skills"
   "${HOME}/.amp:../../.agents/skills"
   "${HOME}/.config/opencode:../../../.agents/skills"
@@ -25,13 +32,23 @@ AGENTS=(
   "${HOME}/.config/crush:../../../.agents/skills"
 )
 
+# sync_agent <path:rel_prefix> <ensure>
+# ensure=1 → mkdir agent home if missing; ensure=0 → skip if home missing
 sync_agent() {
-  local agent_dir="${1%%:*}"
-  local rel_prefix="${1##*:}"
+  local agent_spec="$1"
+  local ensure="${2:-0}"
+  local agent_dir="${agent_spec%%:*}"
+  local rel_prefix="${agent_spec##*:}"
   local skills_dir="${agent_dir}/skills"
   local name="${agent_dir/#"${HOME}"/\~}"
 
-  [ -d "${agent_dir}" ] || return 0
+  if [ ! -d "${agent_dir}" ]; then
+    if [ "${ensure}" -eq 1 ]; then
+      mkdir -p "${agent_dir}"
+    else
+      return 0
+    fi
+  fi
 
   if [ -L "${skills_dir}" ]; then
     echo "  ! ${name}/skills: replacing directory symlink with real dir"
@@ -138,9 +155,19 @@ HOOK
   echo "  syncing ${total} skill(s) …"
   echo ""
 
-  for agent in "${AGENTS[@]}"; do
-    sync_agent "${agent}"
+  local agent
+  for agent in "${CORE_AGENTS[@]}"; do
+    sync_agent "${agent}" 1
   done
+  for agent in "${OPTIONAL_AGENTS[@]}"; do
+    sync_agent "${agent}" 0
+  done
+
+  # Cloud Agents inject available_skills from ~/.claude/skills, not ~/.cursor/skills.
+  if [ ! -d "${HOME}/.claude/skills" ]; then
+    echo "  ✗ ~/.claude/skills missing after sync (required for Cursor Cloud Agents)" >&2
+    exit 1
+  fi
 
   echo ""
   echo "  done."
