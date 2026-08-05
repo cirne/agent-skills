@@ -55,7 +55,8 @@ fi
     ├── global-code-review/
     ├── copy/
     ├── raptor/
-    └── soak/
+    ├── soak/
+    └── grand-sync/
 ```
 
 Each skill is a folder named like its frontmatter `name`, containing at least `SKILL.md`.
