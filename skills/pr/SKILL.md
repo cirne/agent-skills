@@ -39,9 +39,11 @@ Summarize number, title, author, branch, updated. Optional: tag **fast** (`docs`
 ### 0. Load
 
 ```sh
-gh pr view <n> --json number,title,author,headRefName,baseRefName,url,mergeable,mergeStateStatus
+gh pr view <n> --json number,title,author,headRefName,baseRefName,url,mergeable,mergeStateStatus,body
 gh pr checkout <n>
 ```
+
+Read the PR **body** carefully. Extract any **Test plan**, checklist items, manual QA steps, staging/preview requirements, env flags, feature-flag toggles, data setup, or other validation hints. Carry those into §3b and the verdict — do not treat the description as optional flavor text.
 
 ### 1. Sync with default branch
 
@@ -75,11 +77,31 @@ git diff origin/<default-branch>...HEAD --name-only
 
 Fast track: light docs/test hygiene only — no full test suite unless the project requires it.
 
+### 3b. Description validation + user action items
+
+From the PR body (and any linked issue notes quoted there), build two lists:
+
+| Bucket | What belongs |
+|--------|----------------|
+| **Agent-verifiable** | Checklist / Test plan items you can satisfy with local gates, automated tests, lint, code inspection, or `gh`/API checks |
+| **Needs user** | Manual UI clicks, visual QA, staging/preview sign-off, production config, secrets, credentials you lack, product judgment, or any step that requires a human |
+
+Rules:
+
+1. **Meet every agent-verifiable item before PASS.** Unchecked or unmet description requirements → **FAIL** (or block approve) until done or explicitly waived by the user.
+2. **Never approve/merge while any Needs-user item is unmet**, unless the user explicitly confirms each one (or waives it). Listing them is not enough — wait for confirmation.
+3. If the body has no Test plan / validation section, say so in the verdict (`Description validation: none stated`) — do not invent requirements.
+4. When the description and the diff disagree (e.g. Test plan mentions a path not in the PR), call that out; do not silently skip.
+
+Fast track still applies §3b when the description asks for validation beyond docs/test hygiene.
+
 ### 4–7. Code PRs only
 
 Run project gates (scoped + full tests per `/tests`, lint/typecheck, UI/i18n/copy if UI touched, optional `/deslop`). Follow AGENTS.md / `/commit` for the smallest typed gate.
 
-Fast track: skip §4–§7 — record `Tests/Lint/UI/Deslop: skipped (fast track)`.
+Also run or confirm any **agent-verifiable** items from §3b that fall under these gates (scoped tests named in the Test plan, copy checks, etc.).
+
+Fast track: skip §4–§7 unless §3b requires a specific automated check — then run only that check. Record `Tests/Lint/UI/Deslop: skipped (fast track)` when fully skipped.
 
 ### 8. Verdict
 
@@ -88,12 +110,23 @@ PR #<n>: <title>
 Track: fast (docs | tests | docs+tests) | code
 Sync: <ok | updated | blocked>
 Semantic collisions: <none | resolved | FAIL>
+Description validation: <none stated | all agent items met | unmet: …>
+Needs user (do not approve until confirmed):
+- <explicit checklist item or manual step from the PR body>
+- … (or "none")
+Agent-verified from description:
+- <item>: done
+- … (or "none")
 Verdict: PASS | FAIL | PASS WITH WARNINGS
 ```
 
+**Always** print the **Needs user** list explicitly in chat — even when empty (`none`). A PASS that still has unmet Needs-user items is **not** merge-ready; treat approve as blocked until the user confirms or waives each line.
+
 ## `/pr approve <n>`
 
-Only when review **PASS** (or accepted warnings) and the user explicitly asks to approve/merge — including via **`/pr sweep`** / **`/pr fast-approve`** for each PR in that batch.
+Only when review **PASS** (or accepted warnings), **every §3b agent-verifiable item is met**, **every Needs-user item is confirmed or waived by the user**, and the user explicitly asks to approve/merge — including via **`/pr sweep`** / **`/pr fast-approve`** for each PR in that batch.
+
+If Needs-user items remain unconfirmed → **stop**, re-list them, and ask the user to confirm or waive before merging.
 
 ```sh
 gh pr view <n> --json mergeable,mergeStateStatus,headRefName
@@ -174,11 +207,12 @@ Tag each row **fast** (`docs` / `tests` / `docs+tests`) or **code**. Note semant
 
 For each PR classified **fast** (in sort order):
 
-1. Run **`/pr review <n>`** on the fast track only — §0–§1b, §2 (confirm fast), §3, §8. Do **not** run §4–§7.
-2. On **PASS** or **PASS WITH WARNINGS** (warnings documented): run [§ approve](#pr-approve-n) for that `<n>`.
-3. Record: PR number, title, URL, `headRefName`, merge commit sha (if available), remote branch deleted (yes/no).
-4. On **FAIL**: record failure reason; **continue** the loop.
-5. **Always** end the iteration on fresh default branch before the next PR.
+1. Run **`/pr review <n>`** on the fast track only — §0–§1b, §2 (confirm fast), §3, **§3b**, §8. Do **not** run §4–§7 unless §3b requires a specific automated check.
+2. On **PASS** or **PASS WITH WARNINGS** (warnings documented) **and** no unmet Needs-user items: run [§ approve](#pr-approve-n) for that `<n>`.
+3. If §3b has unmet **Needs user** items: **do not merge** — record under Failed (or a separate "Blocked — needs user" section) with the explicit list; **continue** the loop.
+4. Record: PR number, title, URL, `headRefName`, merge commit sha (if available), remote branch deleted (yes/no).
+5. On **FAIL**: record failure reason; **continue** the loop.
+6. **Always** end the iteration on fresh default branch before the next PR.
 
 **Skip** PRs classified **code** without checkout.
 
@@ -204,6 +238,11 @@ Report in chat:
 | PR | Title | Reason |
 |----|-------|--------|
 | #<n> | <title> | <§8 FAIL summary> |
+
+### Blocked — needs user (<count>)
+| PR | Title | User action required |
+|----|-------|----------------------|
+| #<n> | <title> | <explicit Needs-user bullets> |
 
 (Omit sections when count is 0.)
 
