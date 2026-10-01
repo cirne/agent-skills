@@ -56,7 +56,8 @@ fi
     ├── copy/
     ├── raptor/
     ├── soak/
-    └── grand-sync/
+    ├── grand-sync/
+    └── prod-error-fix/
 ```
 
 Each skill is a folder named like its frontmatter `name`, containing at least `SKILL.md`.
