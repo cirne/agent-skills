@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Lists, reviews, and merges GitHub pull requests (maintainer workflow). Fast-track docs/test-only PRs skip heavy gates; code PRs run full local gates. Use when the user invokes /pr, /pr list, /pr review, /pr approve, /pr sweep, or /pr fast-approve.
+description: Lists, reviews, and merges GitHub pull requests (maintainer workflow). Fast-track docs/test-only PRs skip heavy gates; code PRs run full local gates. Use when the user invokes /pr, /pr list, /pr review, /pr approve, /pr sweep, /pr fast-approve, or /pr green.
 ---
 
 # Pull request workflow
@@ -21,10 +21,13 @@ Discover repo conventions first: default branch, whether CI runs on PRs or only 
 | `/pr approve <n>` | Merge after a clean review (user must explicitly approve) |
 | `/pr sweep` | Maintainer batch: serially fast-review + merge every docs/tests-only PR; skip code PRs — see [§ sweep](#pr-sweep) |
 | `/pr fast-approve` | Alias for `/pr sweep` |
+| `/pr green` | Serially review every open PR and merge the clean ones; explain the rest — see [§ green](#pr-green) |
 
 `<n>` may be `#52` or `52`. **`/pr review`** auto-selects **fast track** when every changed file matches the project allowlist; use **`--full`** to override.
 
 **`/pr sweep`** (and **`/pr fast-approve`**) counts as explicit approval for every fast-track PR that passes review in the loop. Invoke it directly — do not merge code PRs in the same pass.
+
+**`/pr green`** counts as explicit approval to merge every PR that is green on GitHub and **PASS** (or accepted warnings) after review. It includes code PRs. It does not merge drafts, red or pending checks, or review failures.
 
 ## `/pr list`
 
@@ -270,6 +273,70 @@ If nothing was fast-track eligible: say so, still list **Remaining open PRs**.
 ```
 
 Pair with automation output (docs triage, coverage-gap agents) — run **`/pr sweep`** after those PRs land, not in parallel with other PR checkouts.
+
+## `/pr green`
+
+Review every open pull request one at a time. Merge the ones that are clean. At the end, explain which ones still need a person.
+
+This is not `/pr sweep`. Sweep skips code. Green reviews code PRs with the full gates in [§ review](#pr-review-n) §4–§7, and fast-track PRs on the fast path.
+
+### Serial only
+
+Each merge updates the default branch. Finish one PR, return to a fresh default branch, then start the next. Do not check out two PRs at once.
+
+If the worktree is dirty, stop. Do not stash, reset, or discard local work.
+
+Between every PR:
+
+```sh
+git fetch origin
+git checkout <default-branch>
+git pull --ff-only origin <default-branch>
+```
+
+### 0. Start on the default branch
+
+Same fetch, checkout, and fast-forward as above.
+
+### 1. List, oldest first
+
+```sh
+gh pr list --base <default-branch> --state open --limit 50 --json number,title,author,headRefName,isDraft,updatedAt,url,statusCheckRollup
+```
+
+Sort by ascending PR number. A pull request is **green** when it is not a draft and every check in `statusCheckRollup` has completed with success (`SUCCESS`, `NEUTRAL`, or `SKIPPED`). Pending, queued, failing, or missing required checks are not green.
+
+### 2. One PR at a time
+
+For each pull request, in order:
+
+1. **Draft, or not green.** Do not check it out. Record it under needs attention, with the draft flag or the check that is failing or still running. Continue.
+2. **Green.** Run **`/pr review <n>`**. Fast-track when §2 says so; otherwise run the code gates. Sync with the default branch before the verdict.
+3. **PASS** or **PASS WITH WARNINGS** (warnings written down): run [§ approve](#pr-approve-n). Record the PR, title, URL, branch, merge commit, and whether the remote branch was deleted.
+4. **FAIL** or not mergeable after sync: do not merge. Record why, in a sentence a reviewer can act on. Continue.
+5. End the iteration on a fresh default branch.
+
+### 3. Closing summary
+
+Fast-forward the local default branch once more, then `gh pr list --base <default-branch> --state open`.
+
+```text
+## /pr green complete
+
+### Merged (<count>)
+| PR | Title | Branch | Merge commit | Branch deleted |
+|----|-------|--------|--------------|----------------|
+| #<n> | <title> | <headRefName> | <sha or n/a> | yes / no |
+
+### Needs attention (<count>)
+| PR | Title | Why |
+|----|-------|-----|
+| #<n> | <title> | <draft, failing check, pending check, or review FAIL in one or two sentences> |
+
+Local default branch: <ff-only ok | note>
+```
+
+Omit a section when its count is 0. The needs-attention rows are the point of the command: say what is wrong and what a follow-up review would have to decide. Do not leave that as "needs review" with no reason.
 
 ## Related
 
