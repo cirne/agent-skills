@@ -69,6 +69,11 @@ git -C "$repo" pull --ff-only --recurse-submodules
 
 If no upstream is set, note `no upstream` and skip the upstream pull and the final push (still merge the default branch when it exists, and still include the repo in the summary).
 
+If the upstream is **gone** after fetch (`git status -sb` shows `[gone]`), the remote branch was already deleted. Do **not** push — that would recreate it.
+
+- The local branch is fully contained in the default branch (`git merge-base --is-ancestor HEAD origin/<default>`): this work already landed. Check out the default branch, fast-forward it (`pull --ff-only`), and delete the leftover local branch (`git branch -d <branch>`). Report `cleaned up <branch> (merged)`. Do not merge the default branch into the deleted branch.
+- The local branch still has commits that are not on the default branch: leave the branch checked out, skip the push, and record **needs attention**. Still merge the default branch per §4 when that merge is clean.
+
 If FF pull fails because of kept local work, resolve per the triage table (stash/pop or ask only when judgment is ambiguous and destructive).
 
 ### 4. Merge latest default branch into the current branch
